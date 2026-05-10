@@ -21,3 +21,5 @@ Wallpaper Engine: Kamu bisa ganti background sesukamu langsung dari galeri.
 Glassmorphism: Tampilan transparan yang modern dan nyaman di mata.
 
 Zero-Server: Tidak ada data yang dikirim ke internet. Semua proses terjadi dan selesai di browser kamu sendiri.
+
+## Untuk Aksesnya: https://mrlowpr.github.io/SandiGenerate/ Master Key: **admin**

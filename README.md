@@ -21,33 +21,3 @@ Wallpaper Engine: Kamu bisa ganti background sesukamu langsung dari galeri.
 Glassmorphism: Tampilan transparan yang modern dan nyaman di mata.
 
 Zero-Server: Tidak ada data yang dikirim ke internet. Semua proses terjadi dan selesai di browser kamu sendiri.
-
-🛠️ Tech Stack
-Logic: Pure JavaScript (ES6+) & Web Crypto API.
-
-Design: Tailwind CSS untuk UI yang responsif.
-
-Icons: Lucide Icons untuk visual yang bersih.
-
-📦 Cara Pakai
-Clone repo:
-
-### Clone and Setup Script
-
-```shell script
-git clone https://github.com/username/SandiGen-Ultra.git
-cd SandiGen-Ultra
-# Langsung buka di browser
-open index.html
-
-Masuk:
-Gunakan akun standar: admin / admin.
-
-🛡️ Analisis Keamanan
-SandiGen Ultra dirancang untuk mematikan teknik serangan umum seperti:
-
-Dictionary Attack: Karena kata kustom sudah dihancurkan posisinya.
-
-Brute-Force: Dengan panjang karakter yang fleksibel hingga 100 digit.
-
-Data Breach: Karena aplikasi ini tidak punya database; tidak ada data yang bisa dicuri dari luar.

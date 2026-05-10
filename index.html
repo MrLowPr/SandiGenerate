@@ -1,203 +1,231 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SandiGen Pro | Custom Engine</title>
+    <title>SandiGen Vault | Atmosphere Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        #advanced-menu { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
-        #advanced-menu.open { max-height: 500px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap');
         
-        /* Background Layer */
-        #bg-layer {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background-size: cover;
-            background-position: center;
-            transition: filter 0.5s, background-image 0.5s;
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .app-surface {
+            background: rgba(10, 15, 30, 0.7);
+            backdrop-filter: blur(25px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+        #dynamic-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 50% 0%, #1e1b4b, #020617);
+            background-size: cover;
+            background-position: center;
+            transition: filter 0.1s linear; 
+        }
+
+        .hidden-gate { display: none; opacity: 0; transform: scale(0.95); }
+        .visible-gate { display: block; opacity: 1; transform: scale(1); transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+
+        /* Custom Sliders Aesthetics */
+        input[type="range"] { -webkit-appearance: none; background: transparent; cursor: ew-resize; }
+        input[type="range"]::-webkit-slider-runnable-track { background: rgba(255,255,255,0.1); height: 4px; border-radius: 10px; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; background: white; border-radius: 50%;
+            margin-top: -6px; border: 2px solid #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
         }
     </style>
 </head>
-<body class="bg-slate-950 flex items-center justify-center min-h-screen p-4 font-sans transition-all">
+<body class="bg-slate-950 text-slate-300 min-h-screen flex items-center justify-center p-4 overflow-hidden">
 
-    <!-- Dinamis Background Layer -->
-    <div id="bg-layer" class="bg-slate-900"></div>
+    <div id="dynamic-bg" style="filter: brightness(0.2) blur(0px);"></div>
 
-    <!-- LOGIN SECTION -->
-    <div id="login-screen" class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200">
+    <div id="login-gate" class="w-full max-w-sm app-surface rounded-[2.5rem] p-10 z-50">
         <div class="text-center mb-8">
-            <div class="inline-flex bg-indigo-600 p-4 rounded-full mb-4 shadow-xl shadow-indigo-200">
-                <i data-lucide="fingerprint" class="text-white w-8 h-8"></i>
+            <div class="inline-flex p-4 bg-indigo-600/20 rounded-3xl border border-indigo-500/30 mb-6">
+                <i data-lucide="shield-check" class="text-indigo-400 w-8 h-8"></i>
             </div>
-            <h1 class="text-2xl font-black text-slate-800">SandiGen <span class="text-indigo-600 font-normal underline decoration-indigo-300">Auth</span></h1>
+            <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Vault Access</h1>
         </div>
-        <form id="login-form" class="space-y-4">
-            <input type="text" id="username" placeholder="admin" required class="w-full bg-slate-50 border-2 border-slate-100 px-4 py-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
-            <input type="password" id="password" placeholder="admin" required class="w-full bg-slate-50 border-2 border-slate-100 px-4 py-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest">Login Access</button>
+        
+        <form id="gate-form" class="space-y-4">
+            <input type="password" id="access-key" placeholder="Enter Master Key" 
+                class="w-full bg-white/5 border border-white/10 px-6 py-5 rounded-2xl outline-none focus:border-indigo-500/50 transition-all text-center mono text-white">
+            <button type="submit" class="w-full bg-white text-slate-950 font-black py-5 rounded-2xl hover:bg-indigo-400 hover:text-white transition-all active:scale-95">
+                UNLOCK SYSTEM
+            </button>
         </form>
     </div>
 
-    <!-- MAIN APP SECTION -->
-    <div id="main-app" class="hidden w-full max-w-md glass-card rounded-[2.5rem] shadow-2xl p-8 border border-white/50">
-        <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-900 p-2 rounded-xl shadow-lg"><i data-lucide="key-round" class="text-indigo-400 w-5 h-5"></i></div>
-                <h1 class="text-xl font-black tracking-tight text-slate-800">SandiGen <span class="text-indigo-600">Ultra</span></h1>
-            </div>
-            <button id="logout-btn" class="text-slate-400 hover:text-red-500 transition-colors p-2"><i data-lucide="power" class="w-5 h-5"></i></button>
-        </div>
-
-        <!-- Display Area -->
-        <div class="relative mb-8 group">
-            <input type="text" id="password-display" readonly class="w-full bg-white/50 border-2 border-white text-slate-800 font-mono text-xl px-5 py-6 rounded-3xl text-center shadow-inner group-hover:border-indigo-200 transition-all">
-            <button id="copy-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-90"><i data-lucide="copy" class="w-5 h-5"></i></button>
-        </div>
-
-        <!-- Main Controls -->
-        <div class="space-y-6">
+    <main id="main-app" class="hidden-gate w-full max-w-lg app-surface rounded-[2rem] p-8 md:p-10 max-h-[90vh] overflow-y-auto">
+        <header class="flex justify-between items-center mb-8">
             <div>
-                <div class="flex justify-between text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-slate-400">
-                    <span>Entropy Length</span>
-                    <span id="length-val" class="text-indigo-600 bg-indigo-100 px-3 py-1 rounded-lg">24</span>
-                </div>
-                <input type="range" id="length-slider" min="8" max="100" value="24" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                <h1 class="text-xl font-extrabold tracking-tighter text-white">SANDIGEN</h1>
+                <p class="text-[9px] uppercase tracking-[0.4em] text-slate-500 font-bold">Atmosphere Suite</p>
             </div>
-
-            <!-- Advanced Panel -->
-            <div class="bg-white/40 border border-white/60 rounded-3xl p-5 shadow-sm">
-                <button id="toggle-advanced" class="flex items-center justify-between w-full text-xs font-black text-slate-600 uppercase tracking-widest">
-                    <span class="flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4"></i> Lanjutan & Style</span>
-                    <i data-lucide="chevron-down" id="chevron-icon" class="w-4 h-4 transition-transform"></i>
+            <div class="flex gap-1">
+                <label class="p-2 hover:bg-white/5 rounded-xl cursor-pointer text-slate-400" title="Upload Wallpaper">
+                    <i data-lucide="image" class="w-4 h-4"></i>
+                    <input type="file" id="wall-input" class="hidden" accept="image/*">
+                </label>
+                <button id="lock-btn" class="p-2 hover:bg-white/5 rounded-xl text-slate-400" title="Log Out">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
                 </button>
-                
-                <div id="advanced-menu" class="space-y-5">
-                    <!-- Custom Char Input -->
-                    <div class="pt-5">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2 text-center">Scramble Atoms</label>
-                        <input type="text" id="custom-text" placeholder="Wajib ada..." 
-                            class="w-full bg-white border border-slate-100 px-4 py-3 rounded-xl text-sm focus:border-indigo-400 outline-none font-mono text-center">
-                    </div>
+            </div>
+        </header>
 
-                    <!-- Custom Wallpaper -->
-                    <div class="pt-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2 text-center">Custom Wallpaper</label>
-                        <div class="flex items-center justify-center w-full">
-                            <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-slate-200 border-dashed rounded-2xl cursor-pointer bg-white/50 hover:bg-white transition-all">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <i data-lucide="image-plus" class="w-6 h-6 text-slate-400 mb-2"></i>
-                                    <p class="text-[10px] text-slate-400">Klik untuk upload foto</p>
-                                </div>
-                                <input id="bg-upload" type="file" class="hidden" accept="image/*" />
-                            </label>
-                        </div>
+        <section class="relative mb-8 group">
+            <div id="strength-pill" class="absolute -top-3 left-6 px-3 py-1 rounded-full z-20 border text-[9px] font-black uppercase tracking-widest bg-slate-900 border-white/10 text-slate-400">
+                <span id="strength-text">Ready</span>
+            </div>
+            <textarea id="main-out" readonly rows="2" class="w-full bg-black/40 border border-white/5 mono text-2xl p-8 rounded-3xl text-center text-indigo-400 outline-none resize-none overflow-hidden" placeholder="..."></textarea>
+            <button id="copy-btn" class="absolute right-4 bottom-4 p-3 bg-indigo-600 text-white rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-lg">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+            </button>
+        </section>
+
+        <div class="space-y-5">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-1.5">
+                            <i data-lucide="sun" class="w-3 h-3"></i> Exposure
+                        </label>
+                        <span id="bright-label" class="mono text-[10px] text-white">20%</span>
                     </div>
+                    <input type="range" id="bright-slider" min="0" max="100" value="20" class="w-full">
+                </div>
+
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-1.5">
+                            <i data-lucide="layers" class="w-3 h-3"></i> Focus
+                        </label>
+                        <span id="blur-label" class="mono text-[10px] text-white">0px</span>
+                    </div>
+                    <input type="range" id="blur-slider" min="0" max="50" value="0" class="w-full">
                 </div>
             </div>
-        </div>
 
-        <button id="generate-btn" class="w-full mt-8 bg-slate-900 hover:bg-indigo-700 text-white font-black py-5 rounded-[1.5rem] flex items-center justify-center gap-3 shadow-2xl transition-all active:scale-95">
-            <i data-lucide="refresh-cw" id="refresh-icon" class="w-5 h-5"></i>
-            GENERATE ENCRYPTION
-        </button>
-    </div>
+            <div class="bg-white/5 p-5 rounded-2xl border border-white/5 space-y-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Buffer Length</label>
+                    <span id="len-label" class="mono text-white text-xs bg-indigo-600/30 px-2 py-0.5 rounded">32</span>
+                </div>
+                <input type="range" id="len-slider" min="12" max="64" value="32" class="w-full">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-slate-500 uppercase px-1 tracking-widest">Personal Seed</label>
+                <input type="text" id="seed-field" placeholder="Optional salt..." class="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-sm mono outline-none focus:border-indigo-500/40 transition-all">
+            </div>
+
+            <button id="run-gen" class="w-full py-5 bg-white text-slate-950 font-black rounded-2xl transition-all hover:bg-indigo-400 hover:text-white active:scale-95 uppercase tracking-[0.2em] text-xs">
+                Run Generator
+            </button>
+        </div>
+    </main>
 
     <script>
-        lucide.createIcons();
+        const UI = {
+            login: document.getElementById('login-gate'),
+            app: document.getElementById('main-app'),
+            bg: document.getElementById('dynamic-bg'),
+            brightSlider: document.getElementById('bright-slider'),
+            brightLabel: document.getElementById('bright-label'),
+            blurSlider: document.getElementById('blur-slider'),
+            blurLabel: document.getElementById('blur-label'),
+            out: document.getElementById('main-out'),
+            slider: document.getElementById('len-slider'),
+            label: document.getElementById('len-label'),
+            seed: document.getElementById('seed-field'),
+            pill: document.getElementById('strength-pill'),
+            pText: document.getElementById('strength-text')
+        };
 
-        const bgLayer = document.getElementById('bg-layer');
-        const loginScreen = document.getElementById('login-screen');
-        const mainApp = document.getElementById('main-app');
-        const customTextInput = document.getElementById('custom-text');
-        const bgUpload = document.getElementById('bg-upload');
+        // Atmosphere Engine (Handles Filter Merging)
+        let currentBrightness = 0.2;
+        let currentBlur = 0;
 
-        // Logic Background Upload
-        bgUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    bgLayer.style.backgroundImage = `url('${event.target.result}')`;
-                    // Tambahkan blur sedikit agar card terlihat pop-up
-                    bgLayer.style.filter = "blur(4px) brightness(0.6)";
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        const applyFilters = () => {
+            UI.bg.style.filter = `brightness(${currentBrightness}) blur(${currentBlur}px)`;
+        };
 
-        // Logic Login
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        UI.brightSlider.oninput = (e) => {
+            currentBrightness = e.target.value / 100;
+            UI.brightLabel.innerText = `${e.target.value}%`;
+            applyFilters();
+        };
+
+        UI.blurSlider.oninput = (e) => {
+            currentBlur = e.target.value;
+            UI.blurLabel.innerText = `${e.target.value}px`;
+            applyFilters();
+        };
+
+        // Gateway Authentication
+        document.getElementById('gate-form').onsubmit = (e) => {
             e.preventDefault();
-            if(document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'admin') {
-                loginScreen.classList.add('hidden');
-                mainApp.classList.remove('hidden');
-                generatePassword();
-            } else { alert("Kredensial Salah!"); }
-        });
+            if (document.getElementById('access-key').value === "admin") {
+                UI.login.classList.add('hidden-gate');
+                setTimeout(() => {
+                    UI.login.style.display = 'none';
+                    UI.app.style.display = 'block';
+                    setTimeout(() => UI.app.classList.add('visible-gate'), 50);
+                    generate();
+                }, 400);
+            }
+        };
 
-        // Toggle Menu
-        document.getElementById('toggle-advanced').addEventListener('click', () => {
-            document.getElementById('advanced-menu').classList.toggle('open');
-            document.getElementById('chevron-icon').classList.toggle('rotate-180');
-        });
-
-        // Atomic Scramble Engine
-        function generatePassword() {
-            const length = parseInt(document.getElementById('length-slider').value);
-            const customChars = customTextInput.value.split('');
+        // Generator Logic
+        const generate = () => {
+            const L = parseInt(UI.slider.value);
+            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+            let res = UI.seed.value.split('').slice(0, L);
+            const needed = L - res.length;
             
-            if (customChars.length > length) {
-                alert("Karakter kustom terlalu panjang!");
-                return;
+            const rb = new Uint32Array(needed);
+            window.crypto.getRandomValues(rb);
+            rb.forEach(v => res.push(chars[v % chars.length]));
+
+            // Shuffle
+            for (let i = res.length - 1; i > 0; i--) {
+                const j = Math.floor(window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xffffffff + 1) * (i + 1));
+                [res[i], res[j]] = [res[j], res[i]];
             }
 
-            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-            let passwordArray = [...customChars];
-            
-            const randomValues = new Uint32Array(length - customChars.length);
-            window.crypto.getRandomValues(randomValues);
+            UI.out.value = res.join('');
+            const bits = Math.floor(L * Math.log2(chars.length));
+            UI.pText.innerText = bits > 100 ? "Elite" : "Standard";
+            UI.pill.className = `absolute -top-3 left-6 px-3 py-1 rounded-full z-20 border text-[9px] font-black uppercase bg-slate-900 transition-all ${bits > 100 ? 'border-indigo-500 text-indigo-400' : 'border-white/10 text-slate-400'}`;
+        };
 
-            for (let i = 0; i < randomValues.length; i++) {
-                passwordArray.push(charset.charAt(randomValues[i] % charset.length));
+        document.getElementById('run-gen').onclick = generate;
+        UI.slider.oninput = (e) => UI.label.innerText = e.target.value;
+        document.getElementById('lock-btn').onclick = () => location.reload();
+
+        // Wallpaper Engine
+        document.getElementById('wall-input').onchange = (e) => {
+            const f = e.target.files[0];
+            if (f) {
+                const r = new FileReader();
+                r.onload = ev => {
+                    UI.bg.style.backgroundImage = `url('${ev.target.result}')`;
+                };
+                r.readAsDataURL(f);
             }
+        };
 
-            // CSPRNG Shuffle
-            for (let i = passwordArray.length - 1; i > 0; i--) {
-                const jBuffer = new Uint32Array(1);
-                window.crypto.getRandomValues(jBuffer);
-                const j = jBuffer[0] % (i + 1);
-                [passwordArray[i], passwordArray[j]] = [passwordArray[j], passwordArray[i]];
-            }
+        document.getElementById('copy-btn').onclick = async function() {
+            await navigator.clipboard.writeText(UI.out.value);
+            this.classList.replace('bg-indigo-600', 'bg-emerald-500');
+            setTimeout(() => this.classList.replace('bg-emerald-500', 'bg-indigo-600'), 1000);
+        };
 
-            document.getElementById('password-display').value = passwordArray.join('');
-            
-            const icon = document.getElementById('refresh-icon');
-            icon.classList.add('animate-spin');
-            setTimeout(() => icon.classList.remove('animate-spin'), 500);
-        }
-
-        // Action Listeners
-        document.getElementById('generate-btn').addEventListener('click', generatePassword);
-        document.getElementById('length-slider').addEventListener('input', (e) => {
-            document.getElementById('length-val').innerText = e.target.value;
-        });
-
-        document.getElementById('copy-btn').addEventListener('click', function() {
-            navigator.clipboard.writeText(document.getElementById('password-display').value);
-            this.classList.add('bg-green-500');
-            setTimeout(() => this.classList.remove('bg-green-500'), 1000);
-        });
-
-        document.getElementById('logout-btn').addEventListener('click', () => location.reload());
+        lucide.createIcons();
     </script>
 </body>
 </html>

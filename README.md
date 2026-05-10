@@ -32,10 +32,13 @@ Icons: Lucide Icons untuk visual yang bersih.
 📦 Cara Pakai
 Clone repo:
 
-Bash
-git clone https://github.com/username/sandigen-ultra.git
-Buka file:
-Jalankan index.html di browser apa pun.
+### Clone and Setup Script
+
+```shell script
+git clone https://github.com/username/SandiGen-Ultra.git
+cd SandiGen-Ultra
+# Langsung buka di browser
+open index.html
 
 Masuk:
 Gunakan akun standar: admin / admin.
